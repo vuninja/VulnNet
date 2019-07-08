@@ -22,13 +22,19 @@ package data7;
 
 
 
+import data7.model.Data7;
 import data7.model.change.Commit;
 import data7.model.change.FileFix;
 import data7.model.change.FileInterest;
+import data7.ResourcesPath;
 import gitUtilitaries.GitActions;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.api.errors.RefNotAdvertisedException;
 
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -73,7 +79,7 @@ public class Utils {
      * @return a commit object
      * @see Commit
      */
-    public static Commit generateCommitOfInterest(GitActions git, String hash, boolean filter) {
+    public static Commit generateCommitOfInterest(GitActions git, String hash, boolean filter, ResourcesPath path, Data7 data7) {
         try {
             String commitMessage = git.getCommitMessage(hash);
             int timestamp = git.getTimeCommit(hash);
@@ -94,8 +100,13 @@ public class Utils {
             }
             return new Commit(hash, commitMessage, timestamp, fixes);
         } catch (IOException | NullPointerException e) {
-            System.err.println(hash);
+            System.err.println("commit hash: "+hash);
             System.err.println(e.getMessage());
+            try {
+                appendToExistingFile(path, data7, hash, e);
+            } catch (IOException er) {
+                System.err.println(er.getMessage());
+            }
             return null;
         }
     }
@@ -130,7 +141,7 @@ public class Utils {
             }
             return new Commit(hash, commitMessage, timestamp, fixes);
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println(e);
             return null;
         }
     }
@@ -147,5 +158,39 @@ public class Utils {
             f.mkdirs();
         }
         return ;
+    }
+
+    private static void appendToExistingFile(ResourcesPath path, Data7 data7, String hash, Exception e) throws IOException{
+        File errors_csv = new File(path.getErrorPath()+"failed_commits.csv");
+        if (errors_csv.exists()) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(errors_csv, true));
+            writer.append(data7.getProject() +
+                    "," +
+                    hash +
+                    "," +
+                    e.getMessage() +
+                    "\n");
+
+            writer.close();
+        } else {
+            writeToNewFile(path, data7, hash, e);
+        }
+    }
+
+    private static void writeToNewFile(ResourcesPath path, Data7 data7, String hash, Exception e) throws IOException{
+        File errors_dir = new File(path.getErrorPath());
+        errors_dir.mkdir();
+        File errors_csv = new File(path.getErrorPath()+"failed_commits.csv");
+        FileWriter fw = new FileWriter(errors_csv);
+        BufferedWriter writer = new BufferedWriter(fw);
+        writer.write("sep=,\n"+
+                data7.getProject().getName()+
+                ","+
+                hash+
+                ","+
+                e.getMessage()+
+                "\n");
+
+        writer.close();
     }
 }

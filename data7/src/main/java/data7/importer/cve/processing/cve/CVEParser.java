@@ -206,15 +206,13 @@ public class CVEParser implements Callable<List<CVE>> {
      * @return Matcher for the software
      */
     private Matcher softwareMatch(String soft) {
-        String re1 = ".*?";    // Non-greedy match on filler
-        String re2 = "(?:[a-z][a-z]+)";    // Uninteresting: word
-        String re3 = ".*?";    // Non-greedy match on filler
-        String re4 = "(?:[a-z][a-z]+)";   // Uninteresting: word
-        String re5 = ".*?";   // Non-greedy match on filler
-        String re6 = "((?:[a-z][a-z0-9_]+))";    // soft
-        String re7 = ".+?";  // Non-greedy match on filler
-        String re8 = "((?:[a-z0-9_.]+))";    // version
-        Pattern p = Pattern.compile(re1 + re2 + re3 + re4 + re5 + re6 + re7 + re8, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        String re1 = "(?:[a-z][a-z]+)";    // Uninteresting: cpe
+        String re_semi = ":";    // Match literal semicolon
+        String re2 = "(?:/[a|h|o])"; // Uninteresting: part a- application h- hardware o- operating system
+        String re3 = "(?:[a-z][-a-z0-9_.]+)";   // Uniteresting: vendor
+        String re4 = "([a-z][-a-z0-9_.]+)";    // soft
+        String re5 = "([-a-z0-9_.]+).*";    // version and uninteresting
+        Pattern p = Pattern.compile(re1 + re_semi + re2 + re_semi + re3 + re_semi + re4 + re_semi + re5, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         return p.matcher(soft);
     }
 

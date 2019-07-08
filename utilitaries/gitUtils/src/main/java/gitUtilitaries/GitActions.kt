@@ -17,6 +17,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.eclipse.jgit.treewalk.TreeWalk
 import org.eclipse.jgit.treewalk.filter.PathFilter
 import org.eclipse.jgit.util.io.DisabledOutputStream
+import org.eclipse.jgit.api.errors.RefNotAdvertisedException
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileNotFoundException
@@ -346,6 +347,7 @@ class GitActions {
             }
 
         } catch (e: IOException) {
+            print("getListofModifiedFile")
             e.printStackTrace()
         }
         return listOfModifiedFile

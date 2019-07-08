@@ -61,7 +61,7 @@ public class Exporter {
      */
     public  void saveDataset(Data7 data7) throws IOException {
         Utils.checkFolderDestination(path.getBinaryPath());
-        FileOutputStream fos = new FileOutputStream(path.getBinaryPath() + data7.getVulnerabilitySet().getProjectName() + "-data7.obj", false);
+        FileOutputStream fos = new FileOutputStream(path.getBinaryPath() + data7.getVulnerabilitySet().getProjectName().replace("/","_f" ) + "-data7.obj", false);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(data7);
         oos.close();
@@ -76,7 +76,7 @@ public class Exporter {
      * @throws ClassNotFoundException
      */
     public  Data7 loadDataset(String project) throws IOException, ClassNotFoundException {
-        File file = new File(path.getBinaryPath() + project + "-data7.obj");
+        File file = new File(path.getBinaryPath() + project.replace("/","_f" ) + "-data7.obj");
         if (file.exists()) {
             FileInputStream fileIn = new FileInputStream(file);
             ObjectInputStream read = new ObjectInputStream(fileIn);
@@ -112,6 +112,8 @@ public class Exporter {
             rootElement.setAttribute("last_updated", java_date);
 
             rootElement.setAttribute("project", dataset.getProjectName());
+            rootElement.setAttribute("online_repo", data7.getProject().getOnlineRepository());
+            rootElement.setAttribute("languages", data7.getProject().getLanguages());
 
             doc.appendChild(rootElement);
 

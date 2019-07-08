@@ -73,6 +73,18 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
+		    <execution>
+        		<id>copy-dependencies</id>
+        		<phase>package</phase>
+        		<goals>
+          		    <goal>copy-dependencies</goal>
+        		</goals>
+        		<configuration>
+          		    <outputDirectory>${project.build.directory}</outputDirectory>
+          		    <overWriteReleases>false</overWriteReleases>
+          		    <overWriteSnapshots>true</overWriteSnapshots>
+        		</configuration>
+      		    </execution>
                 </executions>
                 <configuration>
                     <source>1.8</source>

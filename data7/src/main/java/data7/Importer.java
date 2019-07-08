@@ -30,7 +30,9 @@ import data7.project.CProjects;
 import data7.project.Project;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -44,6 +46,16 @@ public class Importer {
 
     public Importer(ResourcesPath path) {
         this.path = path;
+        try {
+            File errors_csv = new File(path.getErrorPath() + "failed_commits.csv");
+            if (errors_csv.exists()) {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(errors_csv, true));
+                bw.append("-----New Session-----\n");
+                bw.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -75,11 +87,12 @@ public class Importer {
     public Data7 updateOrCreateDatasetFor(Project project, DatasetUpdateListener... listeners) throws ParseException, IOException, ClassNotFoundException {
         if (project != null) {
             File data7Binary = new File(path.getBinaryPath() + project.getName() + DATA7_OBJ);
-            if (data7Binary.exists()) {
+            /*if (data7Binary.exists()) {
                 return new CVEImporter(path).updateDataset(project.getName(), listeners);
             } else {
                 return new CVEImporter(path).createDataset(project, listeners);
-            }
+            }*/
+            return new CVEImporter(path).createDataset(project, listeners);
         } else {
             throw new RuntimeException("Project is null");
         }
@@ -93,14 +106,14 @@ public class Importer {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static void main(String[] args) throws ParseException, IOException, ClassNotFoundException{
-        ResourcesPath path = new ResourcesPath("/Users/matthieu/Desktop/data7-2/");
-        Importer importer = new Importer(path);
-        importer.getListOfCWE();
-        importer.updateOrCreateDatasetFor(CProjects.LINUX_KERNEL);
-        importer.updateOrCreateDatasetFor(CProjects.OPEN_SSL);
-        importer.updateOrCreateDatasetFor(CProjects.WIRESHARK);
-        importer.updateOrCreateDatasetFor(CProjects.SYSTEMD);
-    }
+//    public static void main(String[] args) throws ParseException, IOException, ClassNotFoundException{
+//        ResourcesPath path = new ResourcesPath("/Users/matthieu/Desktop/data7-2/");
+//        Importer importer = new Importer(path);
+//        importer.getListOfCWE();
+//        importer.updateOrCreateDatasetFor(CProjects.LINUX_KERNEL);
+//        importer.updateOrCreateDatasetFor(CProjects.OPEN_SSL);
+//        importer.updateOrCreateDatasetFor(CProjects.WIRESHARK);
+//        importer.updateOrCreateDatasetFor(CProjects.SYSTEMD);
+//    }
 
 }

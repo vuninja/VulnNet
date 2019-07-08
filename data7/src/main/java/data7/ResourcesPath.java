@@ -9,15 +9,17 @@ public class ResourcesPath {
     private final String gitPath;
     private final String xmlPath;
     private final String cvePath;
+    private final String errorPath;
 
     public ResourcesPath(String path) {
         File f = new File(path);
         if (f.exists() && f.isDirectory()) {
             savingPath = path;
             binaryPath = savingPath + "binary/";
-            gitPath = savingPath + "git/";
+            gitPath = "/auto/ugrad_space/ecvu/git/";
             xmlPath = savingPath + "xml/";
             cvePath = savingPath + "cve/";
+            errorPath = savingPath + "errors/";
         } else throw new RuntimeException("Path is incorrect or inexisting");
     }
 
@@ -40,4 +42,6 @@ public class ResourcesPath {
     public String getCvePath() {
         return cvePath;
     }
+
+    public String getErrorPath() { return errorPath; }
 }

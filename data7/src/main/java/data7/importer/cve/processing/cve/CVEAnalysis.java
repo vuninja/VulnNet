@@ -28,11 +28,13 @@ import data7.model.Data7;
 import data7.model.change.Commit;
 import data7.project.Project;
 import data7.model.vulnerability.Vulnerability;
+import data7.ResourcesPath;
 import gitUtilitaries.GitActions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,9 +50,10 @@ public class CVEAnalysis {
     private final Data7 dataset;
     private final DatasetUpdateListener[] listeners;
     private final GitActions git;
+    private final ResourcesPath path;
 
 
-    private CVEAnalysis(List<CVE> cveList, Data7 dataset, DatasetUpdateListener[] listeners, GitActions git) {
+    private CVEAnalysis(List<CVE> cveList, Data7 dataset, DatasetUpdateListener[] listeners, GitActions git, ResourcesPath path) {
         this.cveList = cveList;
         this.dataset = dataset;
         this.git = git;
@@ -58,6 +61,7 @@ public class CVEAnalysis {
             this.listeners = new DatasetUpdateListener[0];
         }else{
         this.listeners = listeners;}
+        this.path = path;
     }
 
     /**
@@ -147,7 +151,7 @@ public class CVEAnalysis {
 
 
     private void addCommitOfInterest(Vulnerability vulnerability, String hash) {
-        Commit commit = generateCommitOfInterest(git, hash,true);
+        Commit commit = generateCommitOfInterest(git, hash, true, path, dataset);
         if (commit != null) {
             vulnerability.getPatchingCommits().put(hash, commit);
             String bugId = checkCommitForBugId(commit.getMessage());
@@ -176,7 +180,7 @@ public class CVEAnalysis {
     private void addBugToVuln(Vulnerability vulnerability, String bugId) {
         if (dataset.getBugToHash().containsKey(bugId)) {
             for (String hash : dataset.getBugToHash().get(bugId)) {
-                vulnerability.getPatchingCommits().put(hash, generateCommitOfInterest(git, hash,true));
+                vulnerability.getPatchingCommits().put(hash, generateCommitOfInterest(git, hash,true, path, dataset));
             }
             vulnerability.getBugIds().add(bugId);
             bugAddedToVulnerabilityEvent(vulnerability, bugId);
@@ -234,8 +238,8 @@ public class CVEAnalysis {
         }
     }
 
-    public static void proceedWithAnalysis(List<CVE> cveList, Data7 dataset, DatasetUpdateListener[] listeners, GitActions git) {
-        new CVEAnalysis(cveList, dataset, listeners, git).process();
+    public static void proceedWithAnalysis(List<CVE> cveList, Data7 dataset, DatasetUpdateListener[] listeners, GitActions git, ResourcesPath path) {
+        new CVEAnalysis(cveList, dataset, listeners, git, path).process();
     }
 
 }

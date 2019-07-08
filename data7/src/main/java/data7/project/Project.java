@@ -40,6 +40,7 @@ public class Project implements Serializable {
     private final String bugTracker;
     private final String bugTrackerRegexp;
     private final int indexOfBugIdInBugTracker;
+    private final String languages;
 
     /**
      * Constructor of the class
@@ -53,7 +54,7 @@ public class Project implements Serializable {
      * @param bugTrackerRegexp
      * @param indexOfBugIdInBugTracker
      */
-    public Project(String name, String onlineRepository, String regexpOnlineRepo, int indexOfHashInRegexp, String patchInCommitessageRegexp, int indexOfBugIdinCommitMessage, String bugTracker, String bugTrackerRegexp, int indexOfBugIdInBugTracker) {
+    public Project(String name, String onlineRepository, String regexpOnlineRepo, int indexOfHashInRegexp, String patchInCommitessageRegexp, int indexOfBugIdinCommitMessage, String bugTracker, String bugTrackerRegexp, int indexOfBugIdInBugTracker, String languages) {
         this.name = name;
         this.onlineRepository = onlineRepository;
         this.regexpOnlineRepo = regexpOnlineRepo;
@@ -63,6 +64,7 @@ public class Project implements Serializable {
         this.bugTracker = bugTracker;
         this.bugTrackerRegexp = bugTrackerRegexp;
         this.indexOfBugIdInBugTracker = indexOfBugIdInBugTracker;
+        this.languages = languages;
     }
 
     /**
@@ -136,4 +138,6 @@ public class Project implements Serializable {
     public int getIndexOfBugIdInBugTracker() {
         return indexOfBugIdInBugTracker;
     }
+
+    public String getLanguages() { return languages; }
 }

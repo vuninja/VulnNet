@@ -28,6 +28,7 @@ import data7.model.change.Commit;
 import data7.model.change.FileFix;
 import data7.model.change.FileInterest;
 import data7.model.vulnerability.Vulnerability;
+import data7.ResourcesPath;
 import gitUtilitaries.GitActions;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -49,14 +50,16 @@ public class GitAnalysis {
     private final Data7 dataset;
     private final DatasetUpdateListener[] listeners;
     private final GitActions git;
+    private final ResourcesPath path;
 
-    private GitAnalysis(Data7 dataset, DatasetUpdateListener[] listeners, GitActions git) {
+    private GitAnalysis(Data7 dataset, DatasetUpdateListener[] listeners, GitActions git, ResourcesPath path) {
         this.dataset = dataset;
         this.git = git;
         if (listeners == null){
             this.listeners = new DatasetUpdateListener[0];
         }else{
             this.listeners = listeners;}
+        this.path = path;
     }
 
     private void process() {
@@ -112,7 +115,7 @@ public class GitAnalysis {
             for (String cve : cves) {
                 Vulnerability vulnerability = dataset.getVulnerabilitySet().getVulnerabilityDataset().get(cve);
                 if (!vulnerability.getPatchingCommits().containsKey(result.getCommit().getName())) {
-                    Commit commit = generateCommitOfInterest(git, result.getCommit(),true);
+                    Commit commit = generateCommitOfInterest(git, result.getCommit().toString().split("\\s+")[1], true, path, dataset);
                     vulnerability.getPatchingCommits().put(result.getCommit().getName(), commit);
                     commitAddedToVulnerabilityEvent(vulnerability, result.getCommit().getName());
                 }
@@ -133,7 +136,7 @@ public class GitAnalysis {
     private void handleCVEMatch(MatchingCommit result) {
         if (dataset.getVulnerabilitySet().getVulnerabilityDataset().containsKey(result.getCve())) {
             Vulnerability vulnerability = dataset.getVulnerabilitySet().getVulnerabilityDataset().get(result.getCve());
-            Commit commit = generateCommitOfInterest(git, result.getCommit(),true);
+            Commit commit = generateCommitOfInterest(git, result.getCommit().toString().split("\\s+")[1], true, path, dataset);
             vulnerability.getPatchingCommits().put(result.getCommit().getName(), commit);
             if (result.getBugId() != null) {
                 vulnerability.getBugIds().add(result.getBugId());
@@ -164,8 +167,8 @@ public class GitAnalysis {
         }
     }
 
-    public static void proceedWithAnalysis(Data7 dataset, DatasetUpdateListener[] listeners, GitActions git) {
-        new GitAnalysis(dataset, listeners, git).process();
+    public static void proceedWithAnalysis(Data7 dataset, DatasetUpdateListener[] listeners, GitActions git, ResourcesPath path) {
+        new GitAnalysis(dataset, listeners, git, path).process();
     }
 
 }
